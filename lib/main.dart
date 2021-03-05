@@ -1,55 +1,51 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'dart:async';
+import 'package:flutter/services.dart';
+import 'package:AFCSCMS/components/app_theme.dart';
+import 'package:AFCSCMS/util/app_constants.dart';
+import 'package:AFCSCMS/components/splash_screen.dart';
 
-void main() => runApp(MaterialApp(home: WikipediaExplorer()));
-
-class WikipediaExplorer extends StatefulWidget {
-  @override
-  _WikipediaExplorerState createState() => _WikipediaExplorerState();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]).then((_) => runApp(MyApp()));
 }
 
-class _WikipediaExplorerState extends State<WikipediaExplorer> {
-  Completer<WebViewController> _controller = Completer<WebViewController>();
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: WebView(
-          initialUrl: 'http://105.112.136.217/',
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller.complete(webViewController);
-          },
-        ),
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness:
+          Platform.isAndroid ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarDividerColor: Colors.grey,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ));
+    return MaterialApp(
+      title: AppConstants.title,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        textTheme: AppTheme.textTheme,
+        platform: TargetPlatform.iOS,
       ),
-      //floatingActionButton: _settingButton(),
+      home: SplashScreen(), //NavigationHomeScreen(),
     );
   }
+}
 
-  /*
-  _settingButton() {
-    return FutureBuilder<WebViewController>(
-      future: _controller.future,
-      builder:
-          (BuildContext context, AsyncSnapshot<WebViewController> controller) {
-        if (controller.hasData) {
-          return FloatingActionButton(
-            onPressed: () async {
-              var url = await controller.data.currentUrl();
-              _favorites.add(url);
-              Scaffold.of(context).showSnackBar(
-                SnackBar(content: Text('Settings Comming Soon')),
-              );
-            },
-            child: Icon(Icons.settings),
-          );
-        }
-        return Container();
-      },
-    ); 
+class HexColor extends Color {
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll('#', '');
+    if (hexColor.length == 6) {
+      hexColor = 'FF' + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
   }
-  */
-
 }
